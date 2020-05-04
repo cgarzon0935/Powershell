@@ -12,10 +12,10 @@ Active Directory administrator permissions already in place.
 $date = [datetime]::Today.ToString('dd-MM-yyyy')
 
 # Path building
-$path1 = "C:\Automation\logs\"
-$path2 = "AD_ReturnedFurloughUsers_$date.csv"
+$path1 = "C:\path_of_log_file\"
+$path2 = "name_of_log_$date.csv"
 $pathFinal = $path1 + $path2
-$FurloughList = Import-Csv -Delimiter "," -Path "C:\Automation\Furlough.csv"
+$FurloughList = Import-Csv -Delimiter "," -Path "C:\get_csv_file_here"
 
 Import-Module ActiveDirectory
 
@@ -29,13 +29,6 @@ foreach ($User in $FurloughList){
 
     # Clean User Input Data
     $sam = $User.FirstName.tolower().trim() + "." + $User.LastName.tolower().trim()
-
-    #get ad status - enabled and directory 
-    #Get-ADUser $sam | Select -Property Enabled, DistinguishedName
-     
-    #get gsuite status - enabled and directory  
-    #C:\GAM\gam.exe info user $email
-
 
     Write-Host (" Returning " +$sam+ " back to Snapsheet
     ")
@@ -53,8 +46,9 @@ foreach ($User in $FurloughList){
     Write-Host ("* " + $din + "'s Active Directory account is enabled.") -ForegroundColor Yellow
 
     # Move account to the Active Users OU
-    Move-ADObject -Identity $dn -TargetPath "OU=Users,OU=Internal,DC=snapsheet,DC=net"
-    Write-Host ("* " + $din + "'s Active Directory account moved to 'Active Users' OU") -ForegroundColor Yellow
+
+    Move-ADObject -Identity $dn -TargetPath "OU=Move_Those_Guys_here"
+    Write-Host ("* " + $din + "'s Active Directory account moved to our Active Users OU") -ForegroundColor Yellow
 
     # Set password
     $Random = Get-Random -Minimum 10000 -Maximum 99999
@@ -66,15 +60,15 @@ foreach ($User in $FurloughList){
     <# --- Start GSuite Account Modifications ---#>
 
     # Initialize the full path of GAM
-    $gam=C:\GAM\gam.exe
+    $gam=get_gam_dir.exe
 
     # Reenable gsuite account
     gam update user $email suspended off
     Write-Host ("* " + $din + "'s Gsuite Account has been enabled.") -ForegroundColor Yellow
 
     # Move account to the Active Users OU 
-    gam update user $email ou /Active_Employees
-    Write-Host ("* " + $din + "'s Gsuite Account moved to /Active_Employees.") -ForegroundColor Yellow
+    gam update user $email ou 
+    Write-Host ("* " + $din + "'s Gsuite Account moved to Active Employee OU.") -ForegroundColor Yellow
 
     Write-Host ("
     ****************** Finished Processing " +$sam+ " ******************
